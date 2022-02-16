@@ -5,6 +5,7 @@ const { joinVoiceChannel } = require("@discordjs/voice");
 const { DisTube } = require("distube");
 const { SpotifyPlugin } = require("@distube/spotify");
 const { OpusEncoder } = require("@discordjs/opus");
+const { YtDlpPlugin } = require("@distube/yt-dlp");
 const encoder = new OpusEncoder(48000, 2);
 
 const client = new Discord.Client({
@@ -15,7 +16,8 @@ const config = {
 };
 
 const distube = new DisTube(client, {
-  plugins: [new SpotifyPlugin({ emitEventsAfterFetching: true })],
+  youtubeDL : false,
+  plugins: [new SpotifyPlugin({ emitEventsAfterFetching: true }), new YtDlpPlugin()],
   searchSongs: 5,
   searchCooldown: 30,
   leaveOnEmpty: false,
@@ -700,6 +702,29 @@ client.on("messageCreate", async (message) => {
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
     await message.channel.send({ embeds: [developer] });
   }
+  if (command === "help") {
+    const help = new MessageEmbed()
+      .setColor(color_success_play)
+      .setTitle("My commands :")
+      .setDescription(
+      `\`$join\` - Joins the voice channel your currently in \n 
+      \`$play <song/playlist>\` - Play a playlist or a song \n 
+      \`$playLast\` - Plays the last song played, if there's one \n 
+      \`$skip\` - Skips the current song \n 
+      \`$leave\` - Leaves the voice channel \n 
+      \`$queue\` - Displays the current queue \n 
+      \`$resume\` - Resumes the player \n 
+      \`$pause\` - Pauses the player \n
+      \`$skipTo <number>\` - Skips to the song number that you want \n
+      \`$repeatMode <number>\` - Sets the repeat mode \n
+      \`$nowPlaying\` - Shows what's currently playing \n
+      \`$seek\` - Seeks to a desired position in the song \n
+      \`$shuffle\` - Shuffles the queue \n
+      \`$aboutMe\` - Shows information about the bot`
+      )
+      .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+    await message.channel.send({ embeds : [help] })
+  }
 });
 
 distube.on("finish", async (queue) => {
@@ -775,6 +800,11 @@ distube.on("searchNoResult", async (queue) => {
   await queue.channel.send({ embeds: [no_result] });
 });
 
+distube.on("searchResult", () => {})
+distube.on("searchCancel", () => {})
+distube.on("searchInvalidAnswer", () => {})
+
+
 client.on("voiceStateUpdate", async (oldState, newState) => {
   if (oldState.channelId === null && newState.channelId !== null) {
     return;
@@ -788,5 +818,8 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
     }
   }
 });
+
+
+
 
 client.login(process.env.TOKEN);
