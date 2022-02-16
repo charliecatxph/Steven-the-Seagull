@@ -21,14 +21,13 @@ const distube = new DisTube(client, {
   plugins: [new SpotifyPlugin({ emitEventsAfterFetching: true }), new YtDlpPlugin()],
   searchSongs: 5,
   searchCooldown: 30,
-  leaveOnEmpty: false,
-  leaveOnFinish: false,
-  leaveOnStop: false,
+  leaveOnEmpty: true,
+  leaveOnFinish: true,
 });
 
 client.on("ready", (client) => {
   console.log(`Logged in as ${client.user.tag}!`);
-  client.user.setActivity("$join");
+  client.user.setActivity("need help? $help");
 });
 
 const color_success_play = "#1ABC9C";
@@ -752,7 +751,7 @@ client.on("messageCreate", async (message) => {
         } else {
           const nowPlaying = new MessageEmbed()
             .setColor(color_fail_pause_emptyQueue)
-            .setTitle("Now playing command fail :")
+            .setTitle("Lyrics command fail :")
             .setDescription(`There's nothing playing right now.`)
             .setAuthor({ name: "🌊🐦 Steven the Seagull" });
           await message.channel.send({ embeds: [nowPlaying] });
