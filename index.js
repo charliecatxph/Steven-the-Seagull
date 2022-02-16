@@ -6,6 +6,7 @@ const { DisTube } = require("distube");
 const { SpotifyPlugin } = require("@distube/spotify");
 const { OpusEncoder } = require("@discordjs/opus");
 const { YtDlpPlugin } = require("@distube/yt-dlp");
+const songlyrics = require('songlyrics').default 
 const encoder = new OpusEncoder(48000, 2);
 
 const client = new Discord.Client({
@@ -720,10 +721,60 @@ client.on("messageCreate", async (message) => {
       \`$nowPlaying\` - Shows what's currently playing \n
       \`$seek\` - Seeks to a desired position in the song \n
       \`$shuffle\` - Shuffles the queue \n
+      \`$lyrics - Gets the lyrics of the current song, if there's one \n\`
       \`$aboutMe\` - Shows information about the bot`
       )
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
     await message.channel.send({ embeds : [help] })
+  }
+  if (command === "lyrics") {
+    if (message.guild.me.voice.channel) {
+      if (message.member.voice.channelId === message.guild.me.voice.channelId) {
+        const queue = distube.getQueue(message);
+        if (queue !== undefined) {
+          const mapSong = queue.songs.map((d) => d.name);
+          const songLyrics = songlyrics(mapSong[0]).then((lyrics) => {
+            const lyrics_embed = new MessageEmbed()
+            .setColor(color_playing)
+            .setTitle("Lyrics :")
+            .setDescription(`Lyrics for the song : ${mapSong[0]} \n \n ${lyrics.lyrics}`)
+            .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+           message.channel.send({ embeds: [lyrics_embed] });
+          }).catch((e) => {
+            const lyrics_fail_embed = new MessageEmbed()
+            .setColor(color_fail_pause_emptyQueue)
+            .setTitle("No lyrics :")
+            .setDescription(`No lyrics for the current song.`)
+            .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+           message.channel.send({ embeds: [lyrics_fail_embed] });
+          })
+          
+        } else {
+          const nowPlaying = new MessageEmbed()
+            .setColor(color_fail_pause_emptyQueue)
+            .setTitle("Now playing command fail :")
+            .setDescription(`There's nothing playing right now.`)
+            .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+          await message.channel.send({ embeds: [nowPlaying] });
+        }
+      } else {
+        const connection_fail_not_in_vc = new MessageEmbed()
+          .setColor(color_fail_pause_emptyQueue)
+          .setTitle("Command fail :")
+          .setDescription(
+            `To use the command \`$play\`, you and I must both be in the same voice channel first.`
+          )
+          .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+        await message.channel.send({ embeds: [connection_fail_not_in_vc] });
+      }
+    } else {
+      const connection_fail_bot_in_vc = new MessageEmbed()
+        .setColor(color_fail_pause_emptyQueue)
+        .setTitle("Command fail :")
+        .setDescription(`Add me to the voice channel using \`$join\`!`)
+        .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+      await message.channel.send({ embeds: [connection_fail_bot_in_vc] });
+    }
   }
 });
 
