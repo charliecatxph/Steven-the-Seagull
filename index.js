@@ -699,7 +699,7 @@ client.on("messageCreate", async (message) => {
     const developer = new MessageEmbed()
       .setColor(color_success_play)
       .setTitle("About me :")
-      .setDescription(`Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub link : https://github.com/charliecatxph \n \n Version : v1.0`)
+      .setDescription(`Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n \n Version : v1.1`)
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
     await message.channel.send({ embeds: [developer] });
   }
