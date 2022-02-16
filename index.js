@@ -720,7 +720,7 @@ client.on("messageCreate", async (message) => {
       \`$nowPlaying\` - Shows what's currently playing \n
       \`$seek\` - Seeks to a desired position in the song \n
       \`$shuffle\` - Shuffles the queue \n
-      \`$lyrics - Gets the lyrics of the current song, if there's one \n\`
+      \`$lyrics\` - Gets the lyrics of the current song, if there's one \n
       \`$aboutMe\` - Shows information about the bot`
       )
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
