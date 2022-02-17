@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const { MessageEmbed } = require("discord.js");
 const Discord = require("discord.js");
 const { joinVoiceChannel } = require("@discordjs/voice");
@@ -6,23 +6,32 @@ const { DisTube } = require("distube");
 const { SpotifyPlugin } = require("@distube/spotify");
 const { OpusEncoder } = require("@discordjs/opus");
 const { YtDlpPlugin } = require("@distube/yt-dlp");
-const songlyrics = require('songlyrics').default 
+const { add } = require("nodemon/lib/rules");
+const songlyrics = require("songlyrics").default;
 const encoder = new OpusEncoder(48000, 2);
+
+ffmpeg_options = {
+  'options': '-vn',
+  "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
+}
 
 const client = new Discord.Client({
   intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_VOICE_STATES"],
 });
 const config = {
-  prefix: "$"
+  prefix: "$",
 };
 
 const distube = new DisTube(client, {
-  youtubeDL : false,
-  plugins: [new SpotifyPlugin({ emitEventsAfterFetching: true }), new YtDlpPlugin()],
-  searchSongs: 5,
-  searchCooldown: 30,
+  youtubeDL: false,
+  plugins: [
+    new SpotifyPlugin({ emitEventsAfterFetching: true }),
+    new YtDlpPlugin(),
+  ],
   leaveOnEmpty: true,
   leaveOnFinish: true,
+  emitNewSongOnly: true,
+  emptyCooldown: 30,
 });
 
 client.on("ready", (client) => {
@@ -96,9 +105,9 @@ client.on("messageCreate", async (message) => {
             .setAuthor({ name: "🌊🐦 Steven the Seagull" });
           await message.channel.send({ embeds: [looking_for_song] });
           await distube.play(voiceChannel, args.join(" "), {
-            message,
-            textChannel: message.channel,
             member: message.member,
+            textChannel: message.channel,
+            message,
           });
         }
       } else {
@@ -158,7 +167,7 @@ client.on("messageCreate", async (message) => {
         try {
           const queue = distube.getQueue(message);
           if (queue.songs.length === 1) {
-            distube.stop(message);
+            await distube.stop(message);
             const empty_queue = new MessageEmbed()
               .setColor(color_search_skip)
               .setTitle("Queue empty :")
@@ -166,7 +175,7 @@ client.on("messageCreate", async (message) => {
               .setAuthor({ name: "🌊🐦 Steven the Seagull" });
             await message.channel.send({ embeds: [empty_queue] });
           } else {
-            distube.skip(message);
+            await distube.skip(message);
             const skip_success = new MessageEmbed()
               .setColor(color_search_skip)
               .setTitle("Skip success :")
@@ -698,7 +707,9 @@ client.on("messageCreate", async (message) => {
     const developer = new MessageEmbed()
       .setColor(color_success_play)
       .setTitle("About me :")
-      .setDescription(`Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n \n Version : v1.1`)
+      .setDescription(
+        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n \n Version : v1.2`
+      )
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
     await message.channel.send({ embeds: [developer] });
   }
@@ -707,7 +718,7 @@ client.on("messageCreate", async (message) => {
       .setColor(color_success_play)
       .setTitle("My commands :")
       .setDescription(
-      `\`$join\` - Joins the voice channel your currently in \n 
+        `\`$join\` - Joins the voice channel your currently in \n 
       \`$play <song/playlist>\` - Play a playlist or a song \n 
       \`$playLast\` - Plays the last song played, if there's one \n 
       \`$skip\` - Skips the current song \n 
@@ -721,10 +732,11 @@ client.on("messageCreate", async (message) => {
       \`$seek\` - Seeks to a desired position in the song \n
       \`$shuffle\` - Shuffles the queue \n
       \`$lyrics\` - Gets the lyrics of the current song, if there's one \n
+      \`$setFilter <filter>\` - Sets the queue sound filter \n
       \`$aboutMe\` - Shows information about the bot`
       )
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-    await message.channel.send({ embeds : [help] })
+    await message.channel.send({ embeds: [help] });
   }
   if (command === "lyrics") {
     if (message.guild.me.voice.channel) {
@@ -732,22 +744,34 @@ client.on("messageCreate", async (message) => {
         const queue = distube.getQueue(message);
         if (queue !== undefined) {
           const mapSong = queue.songs.map((d) => d.name);
-          const songLyrics = songlyrics(mapSong[0]).then((lyrics) => {
-            const lyrics_embed = new MessageEmbed()
-            .setColor(color_playing)
-            .setTitle("Lyrics :")
-            .setDescription(`Lyrics for the song : ${mapSong[0]} \n \n ${lyrics.lyrics}`)
-            .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-           message.channel.send({ embeds: [lyrics_embed] });
-          }).catch((e) => {
+          try {
+            const songLyrics = songlyrics(mapSong[0])
+              .then((lyrics) => {
+                const lyrics_embed = new MessageEmbed()
+                  .setColor(color_playing)
+                  .setTitle("Lyrics :")
+                  .setDescription(
+                    `Lyrics for the song : ${mapSong[0]} \n \n ${lyrics.lyrics}`
+                  )
+                  .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+                message.channel.send({ embeds: [lyrics_embed] });
+              })
+              .catch((e) => {
+                const lyrics_fail_embed = new MessageEmbed()
+                  .setColor(color_fail_pause_emptyQueue)
+                  .setTitle("No lyrics :")
+                  .setDescription(`No lyrics for the current song.`)
+                  .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+                message.channel.send({ embeds: [lyrics_fail_embed] });
+              });
+          } catch (e) {
             const lyrics_fail_embed = new MessageEmbed()
-            .setColor(color_fail_pause_emptyQueue)
-            .setTitle("No lyrics :")
-            .setDescription(`No lyrics for the current song.`)
-            .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-           message.channel.send({ embeds: [lyrics_fail_embed] });
-          })
-          
+              .setColor(color_fail_pause_emptyQueue)
+              .setTitle("Lyric search fail :")
+              .setDescription(`Error occured while finding song lyrics.`)
+              .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+            message.channel.send({ embeds: [lyrics_fail_embed] });
+          }
         } else {
           const nowPlaying = new MessageEmbed()
             .setColor(color_fail_pause_emptyQueue)
@@ -769,6 +793,75 @@ client.on("messageCreate", async (message) => {
     } else {
       const connection_fail_bot_in_vc = new MessageEmbed()
         .setColor(color_fail_pause_emptyQueue)
+        .setTitle("Command fail :")
+        .setDescription(`Add me to the voice channel using \`$join\`!`)
+        .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+      await message.channel.send({ embeds: [connection_fail_bot_in_vc] });
+    }
+  }
+  if (command === "setFilter") {
+    if (message.guild.me.voice.channel) {
+      if (message.member.voice.channelId === message.guild.me.voice.channelId) {
+        const filter_set = [
+          "3d",
+          "bassboost",
+          "echo",
+          "karaoke",
+          "nightcore",
+          "vaporwave",
+          "none",
+        ];
+        const queue = distube.getQueue(message);
+        if (queue !== undefined) {
+          if (filter_set.includes(args.join(" "))) {
+            const set_filter = distube.setFilter(message, args[0] === "none" ? false : args[0], true);
+            const set_filter_success = new MessageEmbed()
+              .setColor(color_success_play)
+              .setTitle("Filters set :")
+              .setDescription(
+                `Current filters : \`${set_filter.join(", ") || "Off"}\``
+              )
+              .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+            await message.channel.send({ embeds: [set_filter_success] });
+          } else {
+            const cant_set_filter = new MessageEmbed()
+              .setColor(color_fail_pause_emptyQueue)
+              .setTitle("Set filter fail :")
+              .setDescription(
+                `Please tell me what filter to set. \`$setFilter <filter>\` \n 
+            \`3d\` - Sets a 3D filter to the queue \n
+            \`bassboost\` - Sets a BassBoost filter to the queue \n
+            \`echo\` - Sets an Echo filter to the queue \n
+            \`karaoke\` - Sets a Karoke filter to the queue \n
+            \`nightcore\` - Sets a Nightcore filter to the queue \n
+            \`vaporwave\` - Sets a Vaporwave filter to the queue \n
+            \`none\` - Removes all the filters currently set
+            `
+              )
+              .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+            await message.channel.send({ embeds: [cant_set_filter] });
+          }
+        } else {
+          const cant_set_filter = new MessageEmbed()
+            .setColor(color_fail_pause_emptyQueue)
+            .setTitle("Set filter fail :")
+            .setDescription(`Cannot set a filter when nothing is playing.`)
+            .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+          await message.channel.send({ embeds: [cant_set_filter] });
+        }
+      } else {
+        const connection_fail_not_in_vc = new MessageEmbed()
+          .setColor("#FF0000")
+          .setTitle("Command fail :")
+          .setDescription(
+            `To use the command \`$play\`, you and I must both be in the same voice channel first.`
+          )
+          .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+        await message.channel.send({ embeds: [connection_fail_not_in_vc] });
+      }
+    } else {
+      const connection_fail_bot_in_vc = new MessageEmbed()
+        .setColor("#FF0000")
         .setTitle("Command fail :")
         .setDescription(`Add me to the voice channel using \`$join\`!`)
         .setAuthor({ name: "🌊🐦 Steven the Seagull" });
@@ -822,6 +915,19 @@ distube.on("addSong", async (queue, song) => {
   await queue.textChannel.send({ embeds: [addSong] });
 });
 
+distube.on("addList", async (queue, playlist) => {
+  const addList = new MessageEmbed()
+    .setColor(color_success_play)
+    .setTitle("Added a playlist :")
+    .setAuthor({
+      name: "🌊🐦 Steven the Seagull",
+    })
+    .setDescription(
+      `Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to the queue!`
+    );
+  await queue.textChannel.send({ embeds: [addList] });
+});
+
 distube.on("error", async (queue, error) => {
   try {
     await distube.stop(queue);
@@ -835,7 +941,7 @@ distube.on("error", async (queue, error) => {
         name: "🌊🐦 Steven the Seagull",
       })
       .setDescription("I encountered an error. I left the voice channel.");
-    queue.textChannel.send({ embeds: [error_embed] });
+    queue.send({ embeds : [error_embed] })
   }
 });
 
@@ -850,10 +956,9 @@ distube.on("searchNoResult", async (queue) => {
   await queue.channel.send({ embeds: [no_result] });
 });
 
-distube.on("searchResult", () => {})
-distube.on("searchCancel", () => {})
-distube.on("searchInvalidAnswer", () => {})
-
+distube.on("searchResult", () => {});
+distube.on("searchCancel", () => {});
+distube.on("searchInvalidAnswer", () => {});
 
 client.on("voiceStateUpdate", async (oldState, newState) => {
   if (oldState.channelId === null && newState.channelId !== null) {
@@ -868,8 +973,5 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
     }
   }
 });
-
-
-
 
 client.login(process.env.TOKEN);
