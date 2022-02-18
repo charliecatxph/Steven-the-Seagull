@@ -1,4 +1,3 @@
-require("dotenv").config();
 const { MessageEmbed } = require("discord.js");
 const Discord = require("discord.js");
 const Quotes = require("randomquote-api");
