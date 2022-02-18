@@ -10,7 +10,7 @@
     "seagull"
   ],
   "author": "charliecatxph",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@discordjs/opus": "^0.7.0",
     "@discordjs/voice": "^0.8.0",
