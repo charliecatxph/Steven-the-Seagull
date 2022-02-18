@@ -8,6 +8,7 @@ const { SpotifyPlugin } = require("@distube/spotify");
 const { SoundCloudPlugin } = require("@distube/soundcloud");
 const { YtDlpPlugin } = require("@distube/yt-dlp");
 const songlyrics = require("songlyrics").default;
+const { OpusEncoder } = require("@discordjs/opus");
 
 const client = new Discord.Client({
   intents: [
