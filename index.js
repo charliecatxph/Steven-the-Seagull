@@ -1,37 +1,48 @@
 require("dotenv").config();
 const { MessageEmbed } = require("discord.js");
 const Discord = require("discord.js");
+const Quotes = require("randomquote-api");
 const { joinVoiceChannel } = require("@discordjs/voice");
 const { DisTube } = require("distube");
 const { SpotifyPlugin } = require("@distube/spotify");
+const { SoundCloudPlugin } = require("@distube/soundcloud");
 const { OpusEncoder } = require("@discordjs/opus");
 const { YtDlpPlugin } = require("@distube/yt-dlp");
 const { add } = require("nodemon/lib/rules");
 const songlyrics = require("songlyrics").default;
-const encoder = new OpusEncoder(48000, 2);
 
 ffmpeg_options = {
   'options': '-vn',
   "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
-}
+};
 
 const client = new Discord.Client({
-  intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_VOICE_STATES"],
+  intents: [
+    Discord.Intents.FLAGS.GUILDS,
+    Discord.Intents.FLAGS.GUILD_MESSAGES,
+    Discord.Intents.FLAGS.GUILD_VOICE_STATES
+  ],
 });
 const config = {
   prefix: "$",
 };
 
 const distube = new DisTube(client, {
-  youtubeDL: false,
-  plugins: [
-    new SpotifyPlugin({ emitEventsAfterFetching: true }),
-    new YtDlpPlugin(),
-  ],
+  leaveOnStop: false,
   leaveOnEmpty: true,
   leaveOnFinish: true,
-  emitNewSongOnly: true,
   emptyCooldown: 30,
+  emitNewSongOnly: true,
+  emitAddSongWhenCreatingQueue: false,
+  emitAddListWhenCreatingQueue: false,
+  plugins: [
+    new SpotifyPlugin({
+      emitEventsAfterFetching: true,
+    }),
+    new SoundCloudPlugin(),
+    new YtDlpPlugin(),
+  ],
+  youtubeDL: false,
 });
 
 client.on("ready", (client) => {
@@ -708,7 +719,7 @@ client.on("messageCreate", async (message) => {
       .setColor(color_success_play)
       .setTitle("About me :")
       .setDescription(
-        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n \n Version : v1.2`
+        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n Email : steventheseagull.bot@gmail.com \n \n Collaborators : **\`jellix_\`** \n \n Version : v1.3`
       )
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
     await message.channel.send({ embeds: [developer] });
@@ -733,6 +744,7 @@ client.on("messageCreate", async (message) => {
       \`$shuffle\` - Shuffles the queue \n
       \`$lyrics\` - Gets the lyrics of the current song, if there's one \n
       \`$setFilter <filter>\` - Sets the queue sound filter \n
+      \`$quote\` - Gives you a random quote cause' who doesn't like quotes right? \n
       \`$aboutMe\` - Shows information about the bot`
       )
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
@@ -814,7 +826,11 @@ client.on("messageCreate", async (message) => {
         const queue = distube.getQueue(message);
         if (queue !== undefined) {
           if (filter_set.includes(args.join(" "))) {
-            const set_filter = distube.setFilter(message, args[0] === "none" ? false : args[0], true);
+            const set_filter = distube.setFilter(
+              message,
+              args[0] === "none" ? false : args[0],
+              true
+            );
             const set_filter_success = new MessageEmbed()
               .setColor(color_success_play)
               .setTitle("Filters set :")
@@ -828,13 +844,12 @@ client.on("messageCreate", async (message) => {
               .setColor(color_fail_pause_emptyQueue)
               .setTitle("Set filter fail :")
               .setDescription(
-                `Please tell me what filter to set. \`$setFilter <filter>\` \n 
-            \`3d\` - Sets a 3D filter to the queue \n
+                `Please tell me what filter to set. \`$setFilter <filter>\` \n    
             \`bassboost\` - Sets a BassBoost filter to the queue \n
             \`echo\` - Sets an Echo filter to the queue \n
             \`karaoke\` - Sets a Karoke filter to the queue \n
             \`nightcore\` - Sets a Nightcore filter to the queue \n
-            \`vaporwave\` - Sets a Vaporwave filter to the queue \n
+            \`vaporwave\` - Sets a Lo-Fi filter to the queue \n
             \`none\` - Removes all the filters currently set
             `
               )
@@ -851,7 +866,7 @@ client.on("messageCreate", async (message) => {
         }
       } else {
         const connection_fail_not_in_vc = new MessageEmbed()
-          .setColor("#FF0000")
+          .setColor(color_fail_pause_emptyQueue)
           .setTitle("Command fail :")
           .setDescription(
             `To use the command \`$play\`, you and I must both be in the same voice channel first.`
@@ -861,11 +876,31 @@ client.on("messageCreate", async (message) => {
       }
     } else {
       const connection_fail_bot_in_vc = new MessageEmbed()
-        .setColor("#FF0000")
+        .setColor(color_fail_pause_emptyQueue)
         .setTitle("Command fail :")
         .setDescription(`Add me to the voice channel using \`$join\`!`)
         .setAuthor({ name: "🌊🐦 Steven the Seagull" });
       await message.channel.send({ embeds: [connection_fail_bot_in_vc] });
+    }
+  }
+  if (command === "quote") {
+    try {
+      const quoteReq = Quotes.randomQuote();
+      const main_quote = quoteReq.quote;
+      const author_quote = quoteReq.author;
+      const quote_for_u = new MessageEmbed()
+        .setColor(color_success_play)
+        .setTitle("Quote :")
+        .setDescription(`\"${main_quote}\" \n *- ${author_quote}*`)
+        .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+      await message.channel.send({ embeds: [quote_for_u] });
+    } catch (e) {
+      const quoteReq_fail = new MessageEmbed()
+        .setColor(color_fail_pause_emptyQueue)
+        .setTitle("Can't find quote right now :")
+        .setDescription(`Steven can't find a quote right now.`)
+        .setAuthor({ name: "🌊🐦 Steven the Seagull" });
+      await message.channel.send({ embeds: [quoteReq_fail] });
     }
   }
 });
@@ -941,7 +976,7 @@ distube.on("error", async (queue, error) => {
         name: "🌊🐦 Steven the Seagull",
       })
       .setDescription("I encountered an error. I left the voice channel.");
-    queue.send({ embeds : [error_embed] })
+    queue.send({ embeds: [error_embed] });
   }
 });
 
@@ -961,10 +996,18 @@ distube.on("searchCancel", () => {});
 distube.on("searchInvalidAnswer", () => {});
 
 client.on("voiceStateUpdate", async (oldState, newState) => {
-  if (oldState.channelId === null && newState.channelId !== null) {
+  if (
+    oldState.id === "943446885304266752" &&
+    oldState.channelId === null &&
+    newState.channelId !== null
+  ) {
     return;
   }
-  if (oldState.channelId !== null && newState.channelId === null) {
+  if (
+    oldState.id === "943446885304266752" &&
+    oldState.channelId !== null &&
+    newState.channelId === null
+  ) {
     try {
       await distube.stop(oldState);
       return;
