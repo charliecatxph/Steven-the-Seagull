@@ -815,7 +815,6 @@ client.on("messageCreate", async (message) => {
     if (message.guild.me.voice.channel) {
       if (message.member.voice.channelId === message.guild.me.voice.channelId) {
         const filter_set = [
-          "3d",
           "bassboost",
           "echo",
           "karaoke",
