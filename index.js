@@ -6,15 +6,8 @@ const { joinVoiceChannel } = require("@discordjs/voice");
 const { DisTube } = require("distube");
 const { SpotifyPlugin } = require("@distube/spotify");
 const { SoundCloudPlugin } = require("@distube/soundcloud");
-const { OpusEncoder } = require("@discordjs/opus");
 const { YtDlpPlugin } = require("@distube/yt-dlp");
-const { add } = require("nodemon/lib/rules");
 const songlyrics = require("songlyrics").default;
-
-ffmpeg_options = {
-  'options': '-vn',
-  "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
-};
 
 const client = new Discord.Client({
   intents: [
@@ -719,7 +712,7 @@ client.on("messageCreate", async (message) => {
       .setColor(color_success_play)
       .setTitle("About me :")
       .setDescription(
-        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n Email : steventheseagull.bot@gmail.com \n \n Collaborators : **\`jellix_\`** \n \n Version : v1.3`
+        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n Email : steventheseagull.bot@gmail.com \n \n Collaborators : **\`jellix_\`** \n \n Version : v1.4`
       )
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
     await message.channel.send({ embeds: [developer] });
@@ -815,6 +808,7 @@ client.on("messageCreate", async (message) => {
     if (message.guild.me.voice.channel) {
       if (message.member.voice.channelId === message.guild.me.voice.channelId) {
         const filter_set = [
+          "3d",
           "bassboost",
           "echo",
           "karaoke",
