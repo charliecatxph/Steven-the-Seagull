@@ -35,3 +35,7 @@ songlyrics
 
 
 Collaborators : `jellix_`
+
+Many thanks to the developer of Distube, Skick!
+
+**Please credit everyone when you use the source code. Credit Skick, the developer of Distube, me and jellix_.**
