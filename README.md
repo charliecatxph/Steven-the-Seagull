@@ -2,7 +2,7 @@
 ###### powered by discord.js and Distube
 
 ### Welcome to the Steven the Seagull Discord music-bot repository.
-This bot is was coded using Javscript with the pacakages below:
+This bot is was coded using Javascript with the pacakages below:
 ```
 @discordjs/opus
 @discordjs/voice
