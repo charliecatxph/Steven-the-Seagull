@@ -19,9 +19,13 @@
     "@distube/yt-dlp": "^1.0.2",
     "discord.js": "^13.6.0",
     "distube": "^3.3.2",
+    "dotenv": "^16.0.0",
     "libsodium-wrappers": "^0.7.9",
+    "node-youtube-music": "^0.7.0",
+    "nodemon": "^2.0.15",
     "randomquote-api": "^3.5.6",
-    "songlyrics": "^2.2.4"
+    "songlyrics": "^2.2.4",
+    "youtube-music-api-update": "^1.0.6"
   },
   "engines": {
     "node": "16.14.0"
