@@ -304,7 +304,7 @@ client.on("messageCreate", async (message) => {
         if (queue !== undefined) {
           const currentQueue = queue.songs.map(
             (data, index) =>
-              `**${index + 1}. ${data.name} (${data.url}) - \`${data.formattedDuration
+              `**${index + 1}. [${data.name}](${data.url}) - \`${data.formattedDuration
               }\`**`
           );
           if (currentQueue.length <= 10) {
@@ -752,7 +752,7 @@ client.on("messageCreate", async (message) => {
       .setColor(color_success_play)
       .setTitle("About me :")
       .setDescription(
-        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n Email : steventheseagull.bot@gmail.com \n \n Collaborators : **\`jellix_\`** \n \n Version : v1.5`
+        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n Email : steventheseagull.bot@gmail.com \n \n Collaborators : **\`jellix_\`** \n \n Version : v1.6`
       )
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
     await message.channel.send({ embeds: [developer] });
