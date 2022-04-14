@@ -63,9 +63,7 @@ const distube = new DisTube(client, {
 
 client.on("ready", (client) => {
   console.log(`Logged in as ${client.user.tag}!`);
-  client.user.setActivity("need help? $help");
-
-
+  client.user.setActivity("#LetTheEarthBreathe🌎");
 });
 
 const color_success_play = "#1ABC9C";
