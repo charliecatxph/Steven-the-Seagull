@@ -61,6 +61,16 @@ const distube = new DisTube(client, {
   youtubeDL: false,
 });
 
+const create_message = (type, color, title, desc) => {
+  if (type === 1) {
+      return new MessageEmbed().setTitle(title).setColor(color).setAuthor({ name: "🌊🐦 Steven the Seagull"}).setDescription(desc);
+  } else if (type === 2) {
+      return new MessageEmbed().setColor(color).setAuthor({ name: "🌊🐦 Steven the Seagull"}).setDescription(desc);
+  } else {
+
+  }
+} 
+
 client.on("ready", (client) => {
   console.log(`Logged in as ${client.user.tag}!`);
   client.user.setActivity("#LetTheEarthBreathe🌎");
@@ -752,7 +762,7 @@ client.on("messageCreate", async (message) => {
       .setColor(color_success_play)
       .setTitle("About me :")
       .setDescription(
-        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n Email : steventheseagull.bot@gmail.com \n \n Collaborators : **\`jellix_\`** \n \n Version : v1.6`
+        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n Email : steventheseagull.bot@gmail.com \n \n Collaborators : **\`jellix_\`** \n \n Version : v1.7`
       )
       .setAuthor({ name: "🌊🐦 Steven the Seagull" });
     await message.channel.send({ embeds: [developer] });
@@ -790,58 +800,24 @@ client.on("messageCreate", async (message) => {
         if (queue !== undefined) {
           const mapSong = queue.songs.map((d) => d.name);
           try {
-            const songLyrics = songlyrics(mapSong[0])
+           songlyrics(mapSong[0])
               .then((lyrics) => {
-                const lyrics_embed = new MessageEmbed()
-                  .setColor(color_playing)
-                  .setTitle("Lyrics :")
-                  .setDescription(
-                    `Lyrics for the song : ${mapSong[0]} \n \n ${lyrics.lyrics}`
-                  )
-                  .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-                message.channel.send({ embeds: [lyrics_embed] });
+                message.channel.send({ embeds: [create_message(1, color_playing, "Lyrics :", `Lyrics for the song : ${mapSong[0]} \n \n ${lyrics.lyrics}`)] });
               })
               .catch((e) => {
-                const lyrics_fail_embed = new MessageEmbed()
-                  .setColor(color_fail_pause_emptyQueue)
-                  .setTitle("No lyrics :")
-                  .setDescription(`No lyrics for the current song.`)
-                  .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-                message.channel.send({ embeds: [lyrics_fail_embed] });
+                message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "No lyrics :", "No lyrics for the current song.")]});
               });
           } catch (e) {
-            const lyrics_fail_embed = new MessageEmbed()
-              .setColor(color_fail_pause_emptyQueue)
-              .setTitle("Lyric search fail :")
-              .setDescription(`Error occured while finding song lyrics.`)
-              .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-            message.channel.send({ embeds: [lyrics_fail_embed] });
+            message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Lyric search fail :", "Error occured while finding song lyrics.")] });
           }
         } else {
-          const nowPlaying = new MessageEmbed()
-            .setColor(color_fail_pause_emptyQueue)
-            .setTitle("Lyrics command fail :")
-            .setDescription(`There's nothing playing right now.`)
-            .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-          await message.channel.send({ embeds: [nowPlaying] });
+          await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Lyrics command fail :", "There's nothing playing right now.")] });
         }
       } else {
-        const connection_fail_not_in_vc = new MessageEmbed()
-          .setColor(color_fail_pause_emptyQueue)
-          .setTitle("Command fail :")
-          .setDescription(
-            `To use the command \`$play\`, you and I must both be in the same voice channel first.`
-          )
-          .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-        await message.channel.send({ embeds: [connection_fail_not_in_vc] });
+        await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Command fail :", `To use the command \`$play\`, you and I must both be in the same voice channel first.`)] });
       }
     } else {
-      const connection_fail_bot_in_vc = new MessageEmbed()
-        .setColor(color_fail_pause_emptyQueue)
-        .setTitle("Command fail :")
-        .setDescription(`Add me to the voice channel using \`$join\`!`)
-        .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-      await message.channel.send({ embeds: [connection_fail_bot_in_vc] });
+      await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Command fail :", `Add me to the voice channel using \`$join\`!`)] });
     }
   }
   if (command === "setFilter" || command === "sf") {
@@ -863,56 +839,25 @@ client.on("messageCreate", async (message) => {
               args[0] === "none" ? false : args[0],
               true
             );
-            const set_filter_success = new MessageEmbed()
-              .setColor(color_success_play)
-              .setTitle("Filters set :")
-              .setDescription(
-                `Current filters : \`${set_filter.join(", ") || "Off"}\``
-              )
-              .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-            await message.channel.send({ embeds: [set_filter_success] });
+            await message.channel.send({ embeds: [create_message(1, color_success_play, "Filters set :", `Current filters : \`${set_filter.join(", ") || "Off"}\``)]});
           } else {
-            const cant_set_filter = new MessageEmbed()
-              .setColor(color_fail_pause_emptyQueue)
-              .setTitle("Set filter fail :")
-              .setDescription(
-                `Please tell me what filter to set. \`$setFilter <filter>\` \n    
+            await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Set filter fail :", `Please tell me what filter to set. \`$setFilter <filter>\` \n    
             \`bassboost\` - Sets a BassBoost filter to the queue \n
             \`echo\` - Sets an Echo filter to the queue \n
             \`karaoke\` - Sets a Karoke filter to the queue \n
             \`nightcore\` - Sets a Nightcore filter to the queue \n
             \`vaporwave\` - Sets a Lo-Fi filter to the queue \n
             \`none\` - Removes all the filters currently set
-            `
-              )
-              .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-            await message.channel.send({ embeds: [cant_set_filter] });
+            `)]});
           }
         } else {
-          const cant_set_filter = new MessageEmbed()
-            .setColor(color_fail_pause_emptyQueue)
-            .setTitle("Set filter fail :")
-            .setDescription(`Cannot set a filter when nothing is playing.`)
-            .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-          await message.channel.send({ embeds: [cant_set_filter] });
+          await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Set filter fail :", "Cannot set a filter when nothing is playing.")]});
         }
       } else {
-        const connection_fail_not_in_vc = new MessageEmbed()
-          .setColor(color_fail_pause_emptyQueue)
-          .setTitle("Command fail :")
-          .setDescription(
-            `To use the command \`$play\`, you and I must both be in the same voice channel first.`
-          )
-          .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-        await message.channel.send({ embeds: [connection_fail_not_in_vc] });
+        await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Command fail :", `To use the command \`$play\`, you and I must both be in the same voice channel first.`)] });
       }
     } else {
-      const connection_fail_bot_in_vc = new MessageEmbed()
-        .setColor(color_fail_pause_emptyQueue)
-        .setTitle("Command fail :")
-        .setDescription(`Add me to the voice channel using \`$join\`!`)
-        .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-      await message.channel.send({ embeds: [connection_fail_bot_in_vc] });
+      await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Command fail :", "Add me to the voice channel using \`$join\`!")]});
     }
   }
   if (command === "quote") {
@@ -920,23 +865,24 @@ client.on("messageCreate", async (message) => {
       const quoteReq = Quotes.randomQuote();
       const main_quote = quoteReq.quote;
       const author_quote = quoteReq.author;
-      const quote_for_u = new MessageEmbed()
-        .setColor(color_success_play)
-        .setTitle("Quote :")
-        .setDescription(`\"${main_quote}\" \n *- ${author_quote}*`)
-        .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-      await message.channel.send({ embeds: [quote_for_u] });
+      await message.channel.send({ embeds: [create_message(1, color_success_play, "Quote :", `\"${main_quote}\" \n *- ${author_quote}*`)]});
     } catch (e) {
-      const quoteReq_fail = new MessageEmbed()
-        .setColor(color_fail_pause_emptyQueue)
-        .setTitle("Can't find quote right now :")
-        .setDescription(`Steven can't find a quote right now.`)
-        .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-      await message.channel.send({ embeds: [quoteReq_fail] });
+      await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Quote fail :", `Steven can't find a quote right now.`)]});
+    }
+  }
+  if (command === "ping") {
+    try {
+      await message.channel.send({ embeds: [create_message(1, color_success_play, "Ping :", `✈ User: ${Date.now() - message.createdTimestamp}ms.\n🤖 Steven: ${Math.round(client.ws.ping)}ms`)] });
+    } catch (e) {
+      await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Ping fail : ", "Ping test fail.")] });
     }
   }
 });
 
+distube.on("empty", (m) => {
+    m.textChannel.send({ embeds : [create_message(1, color_success_play, "\"Birds have feelings too, yk.\" :", `Why'd you leave me without saying goodbye?\nAnyway, I left the voice channel, have fun.`)]});
+  clearTimeout(timeout);
+})
 
 distube.on("finish", async (queue) => {
   queue.textChannel.send("Queue is empty.");
@@ -979,7 +925,7 @@ distube.on("addSong", async (queue, song) => {
       name: "🌊🐦 Steven the Seagull",
     })
     .setDescription(
-      `Added ${song.name} - ${song.formattedDuration} to the list!`
+      `💿 Added ${song.name} - \`${song.formattedDuration}\` to the list!`
     );
   await queue.textChannel.send({ embeds: [addSong] });
 });
