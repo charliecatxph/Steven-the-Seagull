@@ -123,6 +123,7 @@ const play = async (message, payload, vc) => {
 
 let messageVar;
 let timeout;
+let private = false;
 
 client.on("messageCreate", async (message) => {
   messageVar = message;
@@ -731,67 +732,37 @@ client.on("messageCreate", async (message) => {
             await message.channel.send({ embeds: [shuffle_fail] });
           }
         } else {
-          const shuffle_fail = new MessageEmbed()
-            .setColor(color_fail_pause_emptyQueue)
-            .setTitle("Shuffle fail :")
-            .setDescription(`Can't shuffle! Queue is empty!`)
-            .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-          await message.channel.send({ embeds: [shuffle_fail] });
+          await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Shuffle fail :", `Can't shuffle! Queue is empty!`)] });
         }
       } else {
-        const connection_fail_not_in_vc = new MessageEmbed()
-          .setColor(color_fail_pause_emptyQueue)
-          .setTitle("Command fail :")
-          .setDescription(
-            `To use the command \`$play\`, you and I must both be in the same voice channel first.`
-          )
-          .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-        await message.channel.send({ embeds: [connection_fail_not_in_vc] });
+        await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Command fail :", `To use the command \`$play\`, you and I must both be in the same voice channel first.`)] });
       }
     } else {
-      const connection_fail_bot_in_vc = new MessageEmbed()
-        .setColor(color_fail_pause_emptyQueue)
-        .setTitle("Command fail :")
-        .setDescription(`Add me to the voice channel using \`$join\`!`)
-        .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-      await message.channel.send({ embeds: [connection_fail_bot_in_vc] });
+      await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Command fail :", `Add me to the voice channel using \`$join\`!`)] });
     }
   }
   if (command === "aboutMe") {
-    const developer = new MessageEmbed()
-      .setColor(color_success_play)
-      .setTitle("About me :")
-      .setDescription(
-        `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n Email : steventheseagull.bot@gmail.com \n \n Collaborators : **\`jellix_\`** \n \n Version : v1.7`
-      )
-      .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-    await message.channel.send({ embeds: [developer] });
+    await message.channel.send({ embeds: [create_message(1, color_success_play, "About me :", `Hi! I'm **Steven the Seagull**! I was made by a young developer with the codename **\`<charliecatxph/>\`** who really likes the **"Feeding Steven"** channel on YouTube! \n \n GitHub Link : https://github.com/charliecatxph \n Email : steventheseagull.bot@gmail.com \n \n Collaborators : **\`jellix_\`** \n \n Version : v1.8`)] });
   }
   if (command === "help") {
-    const help = new MessageEmbed()
-      .setColor(color_success_play)
-      .setTitle("My commands :")
-      .setDescription(
-        `\`$join\` - Joins the voice channel your currently in \n 
-      \`$play <song/playlist>\` - Play a playlist or a song \n 
-      \`$playLast\` - Plays the last song played, if there's one \n 
-      \`$skip\` - Skips the current song \n 
-      \`$leave\` - Leaves the voice channel \n 
-      \`$queue\` - Displays the current queue \n 
-      \`$resume\` - Resumes the player \n 
-      \`$pause\` - Pauses the player \n
-      \`$skipTo <number>\` - Skips to the song number that you want \n
-      \`$repeatMode <number>\` - Sets the repeat mode \n
-      \`$nowPlaying\` - Shows what's currently playing \n
-      \`$seek\` - Seeks to a desired position in the song \n
-      \`$shuffle\` - Shuffles the queue \n
-      \`$lyrics\` - Gets the lyrics of the current song, if there's one \n
-      \`$setFilter <filter>\` - Sets the queue sound filter \n
-      \`$quote\` - Gives you a random quote cause' who doesn't like quotes right? \n
-      \`$aboutMe\` - Shows information about the bot`
-      )
-      .setAuthor({ name: "🌊🐦 Steven the Seagull" });
-    await message.channel.send({ embeds: [help] });
+    await message.channel.send({ embeds: [create_message(1, color_success_play, "My commands :", `\`$join\` - Joins the voice channel your currently in \n 
+    \`$play <song/playlist>\` - Play a playlist or a song \n 
+    \`$playLast\` - Plays the last song played, if there's one \n 
+    \`$skip\` - Skips the current song \n 
+    \`$leave\` - Leaves the voice channel \n 
+    \`$queue\` - Displays the current queue \n 
+    \`$resume\` - Resumes the player \n 
+    \`$pause\` - Pauses the player \n
+    \`$skipTo <number>\` - Skips to the song number that you want \n
+    \`$repeatMode <number>\` - Sets the repeat mode \n
+    \`$nowPlaying\` - Shows what's currently playing \n
+    \`$seek\` - Seeks to a desired position in the song \n
+    \`$shuffle\` - Shuffles the queue \n
+    \`$lyrics\` - Gets the lyrics of the current song, if there's one \n
+    \`$setFilter <filter>\` - Sets the queue sound filter \n
+    \`$quote\` - Gives you a random quote cause' who doesn't like quotes right? \n
+    \`$aboutMe\` - Shows information about the bot`
+    )] });
   }
   if (command === "lyrics" || command === "ly") {
     if (message.guild.me.voice.channel) {
@@ -877,6 +848,15 @@ client.on("messageCreate", async (message) => {
       await message.channel.send({ embeds: [create_message(1, color_fail_pause_emptyQueue, "Ping fail : ", "Ping test fail.")] });
     }
   }
+  if (command === "private" || command === "incognito" || command === "hidden") {
+    if (!private) {
+      private = true;
+      await message.channel.send({ embeds: [create_message(2, color_success_play, "Private mode :", `⛔ Private mode is now on.`)] });
+    } else {
+      private = false;
+      await message.channel.send({ embeds: [create_message(2, color_success_play, "Private mode :", `⛔ Private mode is now off.`)] });
+    }
+  }
 });
 
 distube.on("empty", (m) => {
@@ -897,6 +877,7 @@ distube.on('error', (channel, error) => {
 })
 
 distube.on("playSong", async (queue, song) => {
+if (!private) {
   const playSong = new MessageEmbed()
     .setColor(color_playing)
     .setTitle("Playing :")
@@ -915,6 +896,7 @@ distube.on("playSong", async (queue, song) => {
     )
     ;
   await queue.textChannel.send({ embeds: [playSong] });
+    }
 });
 
 distube.on("addSong", async (queue, song) => {
