@@ -103,7 +103,7 @@ function inactiveEmbed() {
       name: "🌊🐦 Steven the Seagull",
     })
     .setDescription(
-      `Steven left you a note: \n \n Hey, Steven here. My owner currently put me in development mode. He's taking care of me and making me better! Sorry I can't be here with you right now but I'll be right back as soon as possible! \n \n - Steven \n \n Time since development mode: **${timeAgo.format(
+      `Steven left you a note: \n \n Hey, Steven here. My owner currently put me in hibernation. He's currently making me better! Sorry I can't be here with you right now but I promise, I'll be right back as soon as possible! \n \n - Steven \n \n Time since hibernation: **${timeAgo.format(
         time_since_dev
       )}**`
     );
