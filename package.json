@@ -20,6 +20,7 @@
     "discord.js": "^13.6.0",
     "distube": "^3.3.2",
     "dotenv": "^16.0.0",
+    "javascript-time-ago": "^2.5.7",
     "libsodium-wrappers": "^0.7.9",
     "node-youtube-music": "^0.7.0",
     "nodemon": "^2.0.15",
